@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colinas Bank</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e7eefc;--muted:#9bb0d6;--brand:#69f0ae;--stroke:rgba(255,255,255,.10);--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);color:var(--text);min-height:100vh;
+      background:radial-gradient(900px 500px at 15% -10%, rgba(105,240,174,.18), transparent 60%),
+      radial-gradient(900px 500px at 85% 10%, rgba(77,208,225,.16), transparent 55%),
+      linear-gradient(180deg,#070c16,var(--bg))}
+    header{border-bottom:1px solid var(--stroke);background:rgba(7,12,22,.55);backdrop-filter:blur(10px)}
+    .wrap{max-width:820px;margin:0 auto;padding:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg, rgba(105,240,174,.35), rgba(77,208,225,.25));border:1px solid rgba(255,255,255,.18)}
+    h1{font-size:18px;margin:0}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .card{margin-top:16px;border:1px solid var(--stroke);border-radius:18px;background:rgba(255,255,255,.04);overflow:hidden}
+    .hd{padding:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .bd{padding:16px}
+    .balance{font-family:var(--mono);font-size:34px;margin:10px 0 0}
+    .gold{color:var(--brand);font-weight:900}
+    .small{font-size:12px;color:var(--muted);line-height:1.5}
+    .mono{font-family:var(--mono)}
+    .btn{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:800}
+    .btn.primary{background:rgba(105,240,174,.16);border-color:rgba(105,240,174,.35)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .notice{margin-top:12px;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Colinas Bank</h1>
+        <div class="sub">Consulta individual • <span class="gold">ColinasGold</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <div class="hd">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="small">Titular</div>
+          <div style="font-size:18px;font-weight:900" id="nome">—</div>
+        </div>
+        <button class="btn primary" id="atualizar">Atualizar</button>
+      </div>
+      <div class="small" style="margin-top:6px">Conta: <span class="mono" id="id">—</span></div>
+    </div>
+    <div class="bd">
+      <div class="small">Saldo</div>
+      <div class="balance"><span class="gold" id="saldo">0</span> <span class="small">CG</span></div>
+      <div class="notice" id="status">Carregando…</div>
+    </div>
+  </div>
+
+  <div class="notice">
+    Este link é pessoal. Se alguém compartilhar seu link, a pessoa consegue ver seu saldo.
+  </div>
+</main>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbydNhvOHtzpsoXg8-I92odWshybzwt_AC_bfhCESq0GLxr76kPFxNDhc_zHhK9ajqcp/exec";
+
+function qp(name){
+  return new URLSearchParams(location.search).get(name);
+}
+function fmt(n){ return (Number(n)||0).toLocaleString("pt-BR"); }
+
+const token = qp("t");
+const status = document.getElementById("status");
+
+async function carregar(){
+  if(!token){
+    status.textContent = "Token ausente no link. Peça o link correto para a professora.";
+    return;
+  }
+  status.textContent = "Carregando…";
+  try{
+    const r = await fetch(`${API_URL}?action=me&t=${encodeURIComponent(token)}`);
+    const data = await r.json();
+    if(!data.ok){
+      status.textContent = "Erro: " + (data.error || "não consegui carregar.");
+      return;
+    }
+    document.getElementById("nome").textContent = data.account.name;
+    document.getElementById("id").textContent = data.account.id;
+    document.getElementById("saldo").textContent = fmt(data.account.balance);
+    status.textContent = "Atualizado.";
+  }catch(e){
+    status.textContent = "Falha de conexão. Tente novamente.";
+  }
+}
+
+document.getElementById("atualizar").onclick = carregar;
+carregar();
+</script>
+</body>
+</html>
