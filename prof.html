@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colinas Bank • Painel do Professor</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e7eefc;--muted:#9bb0d6;--brand:#69f0ae;--stroke:rgba(255,255,255,.10);--mono:ui-monospace,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);color:var(--text);min-height:100vh;
+      background:radial-gradient(900px 500px at 15% -10%, rgba(105,240,174,.18), transparent 60%),
+      radial-gradient(900px 500px at 85% 10%, rgba(77,208,225,.16), transparent 55%),
+      linear-gradient(180deg,#070c16,var(--bg))}
+    header{border-bottom:1px solid var(--stroke);background:rgba(7,12,22,.55);backdrop-filter:blur(10px)}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg, rgba(105,240,174,.35), rgba(77,208,225,.25));border:1px solid rgba(255,255,255,.18)}
+    h1{font-size:18px;margin:0}
+    .sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--stroke);border-radius:18px;background:rgba(255,255,255,.04);overflow:hidden}
+    .hd{padding:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .bd{padding:16px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input,select{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(8,14,26,.55);color:var(--text);outline:none}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row>*{flex:1 1 180px}
+    .btn{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--text);padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:900}
+    .btn.primary{background:rgba(105,240,174,.16);border-color:rgba(105,240,174,.35)}
+    .btn.warn{background:rgba(255,209,102,.12);border-color:rgba(255,209,102,.25)}
+    .mono{font-family:var(--mono)}
+    .gold{color:var(--brand);font-weight:900}
+    .notice{margin-top:12px;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;line-height:1.5}
+    .list{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow:auto}
+    .item{display:flex;justify-content:space-between;gap:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;background:rgba(12,18,34,.35)}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Colinas Bank • Painel do Professor</h1>
+        <div class="sub">Crie contas, atualize saldos e copie links individuais</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <div class="card">
+      <div class="hd">
+        <h2 style="margin:0;font-size:15px">Gerenciar</h2>
+        <div class="sub">Requer PIN (o mesmo do Apps Script)</div>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <div>
+            <label for="pin">PIN do professor</label>
+            <input id="pin" type="password" placeholder="Ex: COLINAS2026" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn primary" id="btnLoad">Carregar contas</button>
+          </div>
+        </div>
+
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.08); margin:16px 0">
+
+        <div class="row">
+          <div>
+            <label for="turma">Criar conta • Turma</label>
+            <input id="turma" placeholder="Ex: 1A, 2B, 3A" />
+          </div>
+          <div>
+            <label for="newName">Criar conta • Nome</label>
+            <input id="newName" placeholder="Nome do aluno" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn primary" id="btnCreate">Criar (ID automático)</button>
+          </div>
+        </div>
+
+        <div class="notice" id="status">Insira o PIN e carregue as contas.</div>
+
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.08); margin:16px 0">
+
+        <div class="row">
+          <div>
+            <label for="sel">Selecionar conta</label>
+            <select id="sel"></select>
+          </div>
+          <div>
+            <label for="editName">Renomear</label>
+            <input id="editName" placeholder="Novo nome" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn" id="btnRename">Salvar nome</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label for="val">Valor (CG)</label>
+            <input id="val" type="number" min="1" step="1" placeholder="Ex: 10" />
+          </div>
+          <div>
+            <label for="mot">Motivo (opcional — só para você)</label>
+            <input id="mot" placeholder="participação / atividade / etc." />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <div class="row" style="gap:8px">
+              <button class="btn primary" id="btnAdd">+ Adicionar</button>
+              <button class="btn warn" id="btnSub">− Remover</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label>Link individual do aluno</label>
+            <input id="link" class="mono" readonly />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn" id="btnCopy">Copiar link</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <h2 style="margin:0;font-size:15px">Contas</h2>
+        <div class="sub">Clique em “Carregar contas” para atualizar</div>
+      </div>
+      <div class="bd">
+        <div class="small"><b>API_URL:</b> <span class="mono" id="apiTxt"></span></div>
+        <div class="small" style="margin-top:6px"><b>SITE_BASE:</b> <span class="mono" id="siteTxt"></span></div>
+        <div class="list" id="list"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API_URL  = "https://script.google.com/macros/s/AKfycbydNhvOHtzpsoXg8-I92odWshybzwt_AC_bfhCESq0GLxr76kPFxNDhc_zHhK9ajqcp/exec";
+const SITE_BASE = "COLE_AQUI_SEU_GITHUB_PAGES_URL"; // ex: https://seuusuario.github.io/colinas-bank/
+
+document.getElementById("apiTxt").textContent = API_URL;
+document.getElementById("siteTxt").textContent = SITE_BASE;
+
+const $ = (id)=>document.getElementById(id);
+let ACC = [];
+
+function fmt(n){ return (Number(n)||0).toLocaleString("pt-BR"); }
+
+async function apiList(pin){
+  const r = await fetch(`${API_URL}?action=list&pin=${encodeURIComponent(pin)}`);
+  return r.json();
+}
+async function apiPost(payload){
+  const r = await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(payload)
+  });
+  return r.json();
+}
+
+function fill(){
+  const sel = $("sel");
+  sel.innerHTML = "";
+  for(const a of ACC){
+    const opt = document.createElement("option");
+    opt.value = a.token;
+    opt.textContent = `${a.id} • ${a.name}`;
+    sel.appendChild(opt);
+  }
+  if(ACC[0]) sel.value = ACC[0].token;
+  syncSelected();
+  renderList();
+}
+
+function linkFor(token){
+  const base = SITE_BASE.endsWith("/") ? SITE_BASE : (SITE_BASE + "/");
+  return `${base}index.html?t=${encodeURIComponent(token)}`;
+}
+
+function syncSelected(){
+  const token = $("sel").value;
+  const a = ACC.find(x=>x.token===token);
+  if(!a) return;
+  $("editName").value = a.name;
+  $("link").value = linkFor(a.token);
+}
+
+$("sel").onchange = syncSelected;
+
+function renderList(){
+  const box = $("list");
+  box.innerHTML = "";
+  const sorted = [...ACC].sort((a,b)=> (b.balance||0)-(a.balance||0));
+  for(const a of sorted){
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div>
+        <div style="font-weight:900">${a.name}</div>
+        <div class="small">${a.id} • Turma: <span class="mono">${a.turma||""}</span></div>
+      </div>
+      <div class="mono"><span class="gold">${fmt(a.balance)}</span> CG</div>
+    `;
+    box.appendChild(div);
+  }
+}
+
+$("btnLoad").onclick = async ()=>{
+  const pin = ($("pin").value||"").trim();
+  if(!pin) return $("status").textContent = "Digite o PIN.";
+  $("status").textContent = "Carregando…";
+  const data = await apiList(pin);
+  if(!data.ok) return $("status").textContent = "Erro: " + (data.error||"");
+  ACC = data.accounts || [];
+  fill();
+  $("status").textContent = "Contas carregadas.";
+};
+
+$("btnCreate").onclick = async ()=>{
+  const pin = ($("pin").value||"").trim();
+  const turma = ($("turma").value||"").trim();
+  const name = ($("newName").value||"").trim();
+  if(!pin || !turma || !name) return $("status").textContent = "Preencha PIN, turma e nome.";
+  $("status").textContent = "Criando…";
+  const res = await apiPost({ action:"create", pin, turma, name, balance:0 });
+  if(!res.ok) return $("status").textContent = "Erro: " + (res.error||"");
+  $("turma").value = "";
+  $("newName").value = "";
+  $("status").textContent = `Criado: ${res.id}. Link já disponível.`;
+  // recarrega
+  const data = await apiList(pin);
+  if(data.ok){ ACC = data.accounts || []; fill(); $("sel").value = res.token; syncSelected(); }
+};
+
+$("btnRename").onclick = async ()=>{
+  const pin = ($("pin").value||"").trim();
+  const token = $("sel").value;
+  const name = ($("editName").value||"").trim();
+  if(!pin || !token || !name) return $("status").textContent = "Preencha PIN, conta e nome.";
+  $("status").textContent = "Salvando…";
+  const res = await apiPost({ action:"rename", pin, token, name });
+  if(!res.ok) return $("status").textContent = "Erro: " + (res.error||"");
+  $("status").textContent = "Nome atualizado.";
+  const data = await apiList(pin);
+  if(data.ok){ ACC = data.accounts || []; fill(); $("sel").value = token; syncSelected(); }
+};
+
+async function applyDelta(sign){
+  const pin = ($("pin").value||"").trim();
+  const token = $("sel").value;
+  const v = Math.floor(Number($("val").value||0));
+  if(!pin || !token || v<=0) return $("status").textContent = "Preencha PIN, conta e valor (>0).";
+  $("status").textContent = "Atualizando saldo…";
+  const res = await apiPost({ action:"update", pin, token, delta: sign*v });
+  if(!res.ok) return $("status").textContent = "Erro: " + (res.error||"");
+  $("val").value = "";
+  $("mot").value = "";
+  $("status").textContent = `Saldo: ${fmt(res.before)} → ${fmt(res.after)} CG (sem negativar).`;
+  const data = await apiList(pin);
+  if(data.ok){ ACC = data.accounts || []; fill(); $("sel").value = token; syncSelected(); }
+}
+$("btnAdd").onclick = ()=>applyDelta(+1);
+$("btnSub").onclick = ()=>applyDelta(-1);
+
+$("btnCopy").onclick = async ()=>{
+  const txt = $("link").value;
+  if(!txt) return;
+  try{
+    await navigator.clipboard.writeText(txt);
+    $("status").textContent = "Link copiado!";
+  }catch(e){
+    prompt("Copie o link:", txt);
+  }
+};
+</script>
+</body>
+</html>
